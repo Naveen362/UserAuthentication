@@ -1,5 +1,5 @@
 const express=require('express');
-const {MongoClient}=require('mongodb');
+const {MongoClient, ObjectId}=require('mongodb');
 const jwt=require('jsonwebtoken')
 const cors=require('cors');
 const collectiondb=require('./model/database')
@@ -11,7 +11,7 @@ app.use(express.json());
 const route=express.Router();
 
 const secret_key="qwertyuiopqwertyu";
-route.get('/login',async (req,res)=>{
+route.post('/login',async (req,res)=>{
     const user=req.body;
     try {
         if (!user.name){
@@ -23,17 +23,45 @@ route.get('/login',async (req,res)=>{
         else{
            const collection1= await collectiondb();
            const data=await collection1.findOne(user);
+           console.log(data)
            if (!data){
-            res.status(400).json({message:"login details not found register with new account"});
+            res.status(400).json({message:"login details not found"});
            }
            else{
-            const token=jwt.sign(user,secret_key);
+            const token=jwt.sign(data,secret_key);
             console.log(token);
             res.status(200).json({message:"Logged in Successfully...",userdata:data,token:token})
            }}
     }
     catch {
         res.status(500).json({message:"Server Side Error "})
+    }
+})
+
+
+app.get("/home", (req,res,next)=>{
+    const token=req.headers.authorization.slice(7);
+    jwt.verify(token,secret_key,(err,decode)=>{
+        if (err){
+            res.status(400).json({message:"invalid token"})
+        }
+        else{
+            req.user=decode;
+            next();
+        }
+    })
+},async (req,res)=>{
+    try {
+     const userId=req.user;
+     console.log(userId)
+     const collection= await collectiondb();
+     const data=await collection.findOne({_id:new ObjectId(userId._id)});
+     res.status(200).json({userdata:data,message:"logged in "});
+     console.log(data)
+    }
+    catch (error){
+        console.log("Error",error);
+        res.status(500).json({message:"505 err"})
     }
 })
 app.use('/auth',route);
