@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import { useNavigation } from 'react-router-dom'
+
 
 
 
@@ -20,6 +20,8 @@ let [data1,setdata]=useState("");
     return<div>
         <h1>
             Hai {data1.name}
+
+            <h4>Welcome to home page</h4>
         </h1>
     </div>
 }
