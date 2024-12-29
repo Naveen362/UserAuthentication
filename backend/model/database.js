@@ -1,12 +1,16 @@
-const {MongoClient}=require('mongodb');
-const client=new MongoClient("mongodb://localhost:27017")
+var mongoose=require("mongoose");
+//structure of the document
+var userSchem=new mongoose.Schema({
+    name:{
+        type:String,
+        default:"any demodb",
+        required:true,
+    },
+    email:String,
+    phone:Number,
+});
 
-async function collectiondb(){
+//template of the document
 
-
-    await client.connect();
-    const db=client.db('newone')
-    const collection=db.collection('schooldata');
-    return collection;
-}
-module.exports=collectiondb;
+const userModel=mongoose.model("users",userSchem);
+module.exports=userModel;
